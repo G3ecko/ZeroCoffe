@@ -1,0 +1,14 @@
+.vs/
+packages/
+**/obj/
+**/bin/
+*.user
+TestResults/
+**/xunit-test-results.xml
+**/opencover-report.xml
+**/FolderProfile*.pubxml
+0
+UpgradeLog*
+*.binlog
+.cakebuild/
+Artifacts/
