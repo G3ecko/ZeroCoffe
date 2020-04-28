@@ -14,7 +14,7 @@ public abstract class BasePreHandler<TRequest, TResponse> : IRequestHandler
 
     public virtual Task<TResponse> Handle(TRequest response, Dictionary<string, object> Context)
     {
-        return null;
+        return Task.FromResult((TResponse)default);
     }
 
 }
