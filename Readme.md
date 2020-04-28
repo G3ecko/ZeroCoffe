@@ -1,6 +1,7 @@
 ## ZeroCoffe Simple Mediator Pattern
 
-#### How to use version 1.0.0
+#### How to use version 1.0.0 [![ZeroCoffe](https://circleci.com/gh/circleci/circleci-docs.svg?style=shield)](https://circleci.com/gh/G3ecko/ZeroCoffe)
+
 
 #####  Add meditor service
 ```
