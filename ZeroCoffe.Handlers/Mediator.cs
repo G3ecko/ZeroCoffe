@@ -12,50 +12,46 @@ namespace ZeroCoffe.Handlers
 
     public class Mediator : IMediator
     {
-        public readonly IDictionary<Type, IList<IRequestHandler>> handlers;
-        private readonly IRequestPipeline requestPipeline;
+       
+        public readonly IRequestPipeline requestPipeline;
 
         public Mediator(IRequestPipeline requestPipeline = null)
         {
-            handlers = new Dictionary<Type, IList<IRequestHandler>>();
             this.requestPipeline = requestPipeline ?? new BaseRequestPipeline();
         }
 
-        public void Register<TRequest>(IRequestHandler requestHandler)
+        public void Register<TRequest>(IBaseHandler requestHandler) where TRequest : IRequest
         {
-            var requestType = typeof(TRequest);
-            if (handlers.ContainsKey(requestType))
+            if (requestHandler == null)
             {
-                handlers[requestType].Add(requestHandler);
+                throw new ArgumentNullException($"requestHandler cannot be null");
             }
-            else
-            {
-                handlers[requestType] = new List<IRequestHandler>() { requestHandler };
-            }
-        }
 
-        public IList<IRequestHandler> GetRegisteredRequestHandlers<TRequest>()
-        {
-            var requestType = typeof(TRequest);
-            if (handlers.ContainsKey(requestType))
-            {
-                return handlers[requestType];
-            }
-            else
-            {
-                throw new KeyNotFoundException("No handler registered for this type.");
-            }
+            this.RegisterOnPipeline(requestHandler);
 
         }
 
-        public async Task<List<IResponse>> HandleRequest<TRequest>(IRequest request)
-        {   
-            var registeredHandlers = GetRegisteredRequestHandlers<TRequest>().ToList();
-            foreach (var registeredHandler in registeredHandlers)
-            {
-                requestPipeline.AddNewHandler(registeredHandler, Common.HandlerType.HANDLE);
-            }
+        public async Task<List<IResponse>> HandleRequest(IRequest request)
+        {
             return await requestPipeline.ExecPipeline(request);
+        }
+
+        internal void RegisterOnPipeline(IBaseHandler requestHandler)
+        {
+            Type requestType = requestHandler.GetType();
+
+            if (requestType.GetInterface("IRequestHandler") != null)
+            {
+                requestPipeline.AddNewHandler(requestHandler, Common.HandlerType.HANDLE);
+            }
+            else if (requestType.GetInterface("IPreHandlerRequest") != null)
+            {
+                requestPipeline.AddNewHandler(requestHandler, Common.HandlerType.PRE_HANDLE);
+            }
+            else
+            {
+                throw new ArgumentException("RequestHandler dont have a valid base type");
+            }
         }
 
     }

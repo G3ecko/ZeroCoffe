@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using ZeroCoffe.Handlers.Common;
 using ZeroCoffe.Handlers.Interface;
 
-public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler
+public abstract class Handler<TRequest, TResponse> : IRequestHandler
     where TRequest : IRequest
 {
     public Task<IResponse> RequestHandle(IRequest request, Dictionary<string, object> Context)
@@ -15,4 +16,6 @@ public abstract class BaseHandler<TRequest, TResponse> : IRequestHandler
 
     public abstract Task<TResponse> Handle(TRequest response, Dictionary<string, object> Context);
 
+    public Type GetRequestType() => typeof(TRequest);
+    
 }

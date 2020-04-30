@@ -9,9 +9,10 @@ using ZeroCoffe.Handlers.Common;
 
 namespace ZeroCoffe.Handlers.Interface
 {
-    public interface IRequestHandler : IBaseHandler
+    public interface IBaseHandler
     {
-        
+        Task<IResponse> RequestHandle(IRequest request, Dictionary<string, object> Context);
+        Type GetRequestType();
     }
 
 }

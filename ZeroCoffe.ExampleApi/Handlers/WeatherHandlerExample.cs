@@ -6,7 +6,7 @@ using ZeroCoffe.Handlers.Interface;
 
 namespace ZeroCoffe.ExampleApi.Handlers
 {
-    public class WeatherHandler : BaseHandler<WeatherHandlerRequest, WeatherHandlerResponse>
+    public class WeatherHandler : Handler<WeatherHandlerRequest, WeatherHandlerResponse>
     {
         private static readonly string[] Summaries = new[]
        {
@@ -30,6 +30,18 @@ namespace ZeroCoffe.ExampleApi.Handlers
         }
     }
 
+
+    public class WeatherHandlerValidation : PreHandler<WeatherHandlerRequest, WeatherHandlerResponse>
+    {
+   
+        public override Task<WeatherHandlerResponse> Handle(WeatherHandlerRequest response, Dictionary<string, object> Context)
+        {
+            WeatherHandlerResponse weatherHandlerResponse = new WeatherHandlerResponse();
+            weatherHandlerResponse.AnyError = (string.IsNullOrEmpty(response.text));
+            return Task.FromResult(weatherHandlerResponse); 
+        }
+    }
+
     public class WeatherHandlerResponse : IResponse
     {
         public WeatherHandlerResponse()
@@ -49,5 +61,6 @@ namespace ZeroCoffe.ExampleApi.Handlers
 
     public class WeatherHandlerRequest : IRequest
     {
+        public string text { get; set; }
     }
 }

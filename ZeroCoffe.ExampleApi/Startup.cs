@@ -45,6 +45,9 @@ namespace ZeroCoffe.ExampleApi
 
             app.RegisterService<WeatherHandlerRequest, WeatherHandler>();
 
+            app.RegisterService<ExampleRequest, ValidationExample>();
+            app.RegisterService<ExampleRequest, HandleExample>();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();

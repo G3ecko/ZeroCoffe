@@ -11,25 +11,51 @@ using ZeroCoffe.Handlers.Common;
 namespace ZeroCoffe.ExampleApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]/{action}/")]
     public class WeatherForecastController : ControllerBase
     {
-       
+
 
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly IMediator mediator;
 
-        public WeatherForecastController(IMediator mediator ,ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(IMediator mediator, ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
             this.mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<WeatherForecast>> Get()
+        public async Task<IActionResult> Get()
         {
-            var res =  mediator.HandleRequest<WeatherHandlerRequest>();
-            return (await res).GetResponse<WeatherHandlerResponse>()?.weatherForecasts;
+            var res = await mediator.HandleRequest(new WeatherHandlerRequest());
+            if (res.Any(o => o.AnyError))
+            {
+                return BadRequest();
+            }
+            else
+            {
+                return Ok(res.GetResponse<WeatherHandlerResponse>()?.weatherForecasts);
+            }
+            
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWithValidator(string text)
+        {
+            var request = new ExampleRequest();
+            request.text = text;
+
+            var res = await mediator.HandleRequest(request);
+            if (res.Any(o => o.AnyError))
+            {
+                return BadRequest(res);
+            }
+            else
+            {
+                return Ok(res.GetResponse<ExampleResponse>());
+            }
+
         }
     }
 }

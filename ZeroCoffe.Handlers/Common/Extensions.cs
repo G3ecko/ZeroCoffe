@@ -10,13 +10,13 @@ namespace ZeroCoffe.Handlers.Common
 {
     public static class Extensions
     {
-        public static void RegisterService<IService, TImplementation>(this IApplicationBuilder app) where TImplementation : IRequestHandler
+        public static void RegisterService<IServiceRequest, TImplementation>(this IApplicationBuilder app) where TImplementation : IBaseHandler where IServiceRequest : IRequest
         {
             var mediator = app.ApplicationServices.GetService<IMediator>();
             if (mediator != null)
             {
 
-                mediator.Register<IService>(Activator.CreateInstance<TImplementation>());
+                mediator.Register<IServiceRequest>(Activator.CreateInstance<TImplementation>());
             }
 
         }

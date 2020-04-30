@@ -23,8 +23,30 @@ namespace ZeroCoffe.Handlers.Test
             mediator = new Mediator();
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
             Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
+
+           
             mediator.Register<IRequestMock1>(mock.Object);
-            mediator.handlers.Count.ShouldBe(1);
+            mediator.requestPipeline.Handlers.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public async void When_Meditor_Register_One_PreHandler()
+        {
+            mediator = new Mediator();
+            Mock<IPreHandlerRequest> mock = new Mock<IPreHandlerRequest>();
+            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
+
+
+            mediator.Register<IRequestMock1>(mock.Object);
+            mediator.requestPipeline.preHanlders.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public async void When_Meditor_Register_Null_Handler()
+        {
+            mediator = new Mediator();
+            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
+            Should.Throw<ArgumentNullException>(() => mediator.Register<IRequestMock1>(null));
         }
 
         [Fact]
@@ -32,48 +54,22 @@ namespace ZeroCoffe.Handlers.Test
         {
             mediator = new Mediator();
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
-            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
-            Mock<IRequestMock2> mock2 = new Mock<IRequestMock2>();
-
             mediator.Register<IRequestMock1>(mock.Object);
             mediator.Register<IRequestMock2>(mock.Object);
-            mediator.handlers.Count.ShouldBeGreaterThan(1);
+            mediator.requestPipeline.Handlers.Count.ShouldBeGreaterThan(1);
         }
 
         [Fact]
-        public async void When_Meditor_Register_MoreThan_One_WithSameKey_Handler()
+        public async void When_Meditor_Register_MoreThan_One_WithSameType()
         {
             mediator = new Mediator();
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
             Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
             mediator.Register<IRequestMock1>(mock.Object);
             mediator.Register<IRequestMock1>(mock.Object);
-            mediator.handlers.Values.FirstOrDefault()?.Count.ShouldBeGreaterThan(1);
+            mediator.requestPipeline.Handlers.Count.ShouldBeGreaterThan(1);
         }
 
-
-        [Fact]
-        public async void When_Meditor_Handler_No_Handler_Registered()
-        {
-            mediator = new Mediator();
-            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
-            Should.Throw<KeyNotFoundException>(() => mediator.GetRegisteredRequestHandlers<IRequestMock1>());
-
-        }
-
-        [Fact]
-        public async void When_Meditor_Get_One_Handler()
-        {
-            mediator = new Mediator();
-            Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
-            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
-            mediator.Register<IRequestMock1>(mock.Object);
-
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>();
-
-            res.ShouldNotBeNull();
-            res.Count.ShouldBe(1);
-        }
 
         [Fact]
         public async void When_Meditor_Handle_One_Request()
@@ -81,36 +77,21 @@ namespace ZeroCoffe.Handlers.Test
             mediator = new Mediator();
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
             Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
-            mock.Setup(o => o.RequestHandle(mock1.Object, ctxMock));
-            mediator.Register<IRequestMock1>(mock.Object);
+            Mock<IResponse> responseMock = new Mock<IResponse>();
 
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>();
-            await res.FirstOrDefault().RequestHandle(mock1.Object, ctxMock);
+            responseMock.Setup(o => o.AnyError).Returns(false);
+            mock.Setup(o => o.RequestHandle(mock1.Object, ctxMock)).Returns(Task.FromResult(responseMock.Object));
+
+            Type type = mock1.Object.GetType();
+            mock.Setup(o => o.GetRequestType()).Returns(type);
+
+            mediator.Register<IRequestMock1>(mock.Object);
+            await mediator.HandleRequest(mock1.Object);
 
             mock.Verify(o => o.RequestHandle(mock1.Object, ctxMock), Times.Once);
 
         }
 
-        [Fact]
-        public async void When_Meditor_Get_MoreThanOne_Handler()
-        {
-            mediator = new Mediator();
-            Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
-            Mock<IRequestMock1> reqMock = new Mock<IRequestMock1>();
-            Mock<IRequestHandlerMock> mock2 = new Mock<IRequestHandlerMock>();
-            Mock<IRequestMock2> reqMock2 = new Mock<IRequestMock2>();
-            mediator.Register<IRequestMock1>(mock.Object);
-            mediator.Register<IRequestMock2>(mock2.Object);
-
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>();
-            var res2 = mediator.GetRegisteredRequestHandlers<IRequestMock2>();
-
-            res.ShouldNotBeNull();
-            res.Count.ShouldBe(1);
-
-            res2.ShouldNotBeNull();
-            res2.Count.ShouldBe(1);
-        }
 
         [Fact]
         public async void When_Meditor_Handle_MoreThanOne_Handler()
@@ -120,39 +101,31 @@ namespace ZeroCoffe.Handlers.Test
             Mock<IRequestMock1> reqMock = new Mock<IRequestMock1>();
             Mock<IRequestHandlerMock> mock2 = new Mock<IRequestHandlerMock>();
             Mock<IRequestMock2> reqMock2 = new Mock<IRequestMock2>();
+            Mock<IResponse> responseMock = new Mock<IResponse>();
+
+            responseMock.Setup(o => o.AnyError).Returns(false);
+
+            Type type = reqMock.Object.GetType();
+            mock.Setup(o => o.GetRequestType()).Returns(type);
+
+            Type type2 = reqMock2.Object.GetType();
+            mock2.Setup(o => o.GetRequestType()).Returns(type2);
+
+            mock.Setup(o => o.RequestHandle(reqMock.Object, ctxMock)).Returns(Task.FromResult(responseMock.Object)); ;
+            mock2.Setup(o => o.RequestHandle(reqMock2.Object, ctxMock)).Returns(Task.FromResult(responseMock.Object)); ;
+
+
             mediator.Register<IRequestMock1>(mock.Object);
             mediator.Register<IRequestMock2>(mock2.Object);
 
-
-            mock.Setup(o => o.RequestHandle(reqMock.Object, new Dictionary<string, object>()));
-            mock2.Setup(o => o.RequestHandle(reqMock2.Object, new Dictionary<string, object>()));
-
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>();
-            await res.FirstOrDefault().RequestHandle(reqMock.Object, new Dictionary<string, object>());
-            var res2 = mediator.GetRegisteredRequestHandlers<IRequestMock2>();
-            await res2.FirstOrDefault().RequestHandle(reqMock2.Object, new Dictionary<string, object>());
+            await mediator.HandleRequest(reqMock.Object);
+            await mediator.HandleRequest(reqMock2.Object);
 
             mock.Verify(o => o.RequestHandle(reqMock.Object, ctxMock), Times.Once);
             mock2.Verify(o => o.RequestHandle(reqMock2.Object, ctxMock), Times.Once);
         }
 
-        [Fact]
-        public async void When_Meditor_Get_MoreThanOne_WithSameKey_Handler()
-        {
-            mediator = new Mediator();
-            Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
-            Mock<IRequestMock1> reqMock = new Mock<IRequestMock1>();
-            Mock<IRequestHandlerMock> mock2 = new Mock<IRequestHandlerMock>();
 
-            mediator.Register<IRequestMock1>(mock.Object);
-            mediator.Register<IRequestMock1>(mock2.Object);
-
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>();
-
-            res.ShouldNotBeNull();
-            res.Count.ShouldBe(2);
-
-        }
 
         [Fact]
         public async void When_Meditor_Handle_MoreThanOne_WithSameKey_Handler()
@@ -161,78 +134,32 @@ namespace ZeroCoffe.Handlers.Test
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
             Mock<IRequestMock1> reqMock = new Mock<IRequestMock1>();
             Mock<IRequestHandlerMock> mock2 = new Mock<IRequestHandlerMock>();
+            Mock<IResponse> responseMock = new Mock<IResponse>();
+
+            responseMock.Setup(o => o.AnyError).Returns(false);
+
+            Type type = reqMock.Object.GetType();
+            mock.Setup(o => o.GetRequestType()).Returns(type);
+
+            Type type2 = reqMock.Object.GetType();
+            mock2.Setup(o => o.GetRequestType()).Returns(type2);
+
+            mock.Setup(o => o.RequestHandle(reqMock.Object, ctxMock)).Returns(Task.FromResult(responseMock.Object)); ;
+            mock2.Setup(o => o.RequestHandle(reqMock.Object, ctxMock)).Returns(Task.FromResult(responseMock.Object)); ;
+
 
             mediator.Register<IRequestMock1>(mock.Object);
             mediator.Register<IRequestMock1>(mock2.Object);
 
-            mock.Setup(o => o.RequestHandle(reqMock.Object, ctxMock));
-            mock2.Setup(o => o.RequestHandle(reqMock.Object, ctxMock));
-
-            var res = mediator.GetRegisteredRequestHandlers<IRequestMock1>().ToList();
-            res.ForEach(o => o.RequestHandle(reqMock.Object, ctxMock));
-
+            await mediator.HandleRequest(reqMock.Object);
+     
 
             mock.Verify(o => o.RequestHandle(reqMock.Object, ctxMock), Times.Once);
             mock2.Verify(o => o.RequestHandle(reqMock.Object, ctxMock), Times.Once);
         }
 
 
-        [Fact]
-        public async void When_Meditor_IntegrationTest_HandleRequest_One()
-        {
-            mediator = new Mediator();
-            TestRequest1 testeRequest = new TestRequest1();
-            testeRequest.text = "babababababa";
-
-            mediator.Register<TestRequest1>(new HandlersSample1());
-            var results = await mediator.HandleRequest<TestRequest1>(testeRequest);
-
-            var ouput = results.FirstOrDefault() as TestResponse1;
-
-            ouput.ShouldNotBeNull();
-            ouput.text.ShouldBe(testeRequest.text);
-
-        }
-
-
-        [Fact]
-        public async void When_Meditor_IntegrationTest_HandleRequest_WithPipeline_WithError()
-        {
-            var pipeLine = new BaseRequestPipeline();
-            pipeLine.AddNewHandler(new HandlersSampleWithError(), HandlerType.PRE_HANDLE);
-            mediator = new Mediator(pipeLine);
-            TestRequest1 testeRequest = new TestRequest1();
-            testeRequest.text = "babababababa";
-
-            mediator.Register<TestRequest1>(new HandlersSample1());
-            var results = await mediator.HandleRequest<TestRequest1>(testeRequest);
-
-            var ouput = results.FirstOrDefault() as TestResponse1;
-
-            ouput.ShouldNotBeNull();
-            ouput.AnyError.ShouldBeTrue();
-
-        }
-
-        [Fact]
-        public async void When_Meditor_IntegrationTest_HandleRequest_WithPipeline_NoError()
-        {
-            var pipeLine = new BaseRequestPipeline();
-            pipeLine.AddNewHandler(new HandlersSampleNOError(), HandlerType.PRE_HANDLE);
-            mediator = new Mediator(pipeLine);
-            TestRequest1 testeRequest = new TestRequest1();
-            testeRequest.text = "babababababa";
-
-            mediator.Register<TestRequest1>(new HandlersSample1());
-            var results = await mediator.HandleRequest<TestRequest1>(testeRequest);
-
-            var ouput = results.FirstOrDefault() as TestResponse1;
-
-            ouput.ShouldNotBeNull();
-            ouput.AnyError.ShouldBeFalse();
-            ouput.text.ShouldBe(testeRequest.text);
-
-        }
+       
     }
 }
 

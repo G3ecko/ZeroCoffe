@@ -11,17 +11,16 @@ namespace ZeroCoffe.Handlers
 {
     public class BaseRequestPipeline : IRequestPipeline
     {
-        private List<IRequestHandler> preHanlders;
-        private List<IRequestHandler> Handlers;
+        public List<IBaseHandler> preHanlders { get; private set; }
+        public List<IBaseHandler> Handlers { get; private set; }
 
         public BaseRequestPipeline()
         {
-            preHanlders = new List<IRequestHandler>();
-            Handlers = new List<IRequestHandler>();
-
-
+            preHanlders = new List<IBaseHandler>();
+            Handlers = new List<IBaseHandler>();
         }
-        public void AddNewHandler(IRequestHandler handler, HandlerType handlerType)
+
+        public void AddNewHandler(IBaseHandler handler, HandlerType handlerType)
         {
             switch (handlerType)
             {
@@ -35,26 +34,29 @@ namespace ZeroCoffe.Handlers
             }
         }
 
-       
         public async Task<List<IResponse>> ExecPipeline(IRequest request)
         {
             Dictionary<string, object> Context = new Dictionary<string, object>();
             var resList = new List<IResponse>();
-            await ExecHandlers(request, preHanlders, resList, Context);
+            (var _preHandlers, var _handler) = FilterHandlersByType(request.GetType());
+            await ExecHandlers(request, _preHandlers, resList, Context);
 
             if (resList.Any(o => o.AnyError))
                 return resList;
 
             resList.Clear();
 
-            await ExecHandlers(request, Handlers, resList, Context);
+            await ExecHandlers(request, _handler, resList, Context);
             if (resList.Any(o => o.AnyError))
                 return resList;
 
             return resList;
         }
 
-        private async Task ExecHandlers(IRequest request, List<IRequestHandler> Handlers, List<IResponse> resList, Dictionary<string, object> Context)
+        public (List<IBaseHandler>, List<IBaseHandler>) FilterHandlersByType(Type type) 
+                        => (preHanlders.Where(o => o.GetRequestType() == type).ToList(), Handlers.Where(o => o.GetRequestType() == type).ToList());
+
+        private async Task ExecHandlers(IRequest request, List<IBaseHandler> Handlers, List<IResponse> resList, Dictionary<string, object> Context)
         {
             if (Handlers != null && Handlers.Count > 0)
             {
