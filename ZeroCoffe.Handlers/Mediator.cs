@@ -17,18 +17,7 @@ namespace ZeroCoffe.Handlers
 
         public Mediator(IRequestPipeline requestPipeline = null)
         {
-            this.requestPipeline = requestPipeline ?? new BaseRequestPipeline();
-        }
-
-        public void Register<TRequest>(IBaseHandler requestHandler) where TRequest : IRequest
-        {
-            if (requestHandler == null)
-            {
-                throw new ArgumentNullException($"requestHandler cannot be null");
-            }
-
-            this.RegisterOnPipeline(requestHandler);
-
+            this.requestPipeline = requestPipeline ?? new RequestPipeline();
         }
 
         public async Task<List<IResponse>> HandleRequest(IRequest request)
@@ -36,23 +25,6 @@ namespace ZeroCoffe.Handlers
             return await requestPipeline.ExecPipeline(request);
         }
 
-        internal void RegisterOnPipeline(IBaseHandler requestHandler)
-        {
-            Type requestType = requestHandler.GetType();
-
-            if (requestType.GetInterface("IRequestHandler") != null)
-            {
-                requestPipeline.AddNewHandler(requestHandler, Common.HandlerType.HANDLE);
-            }
-            else if (requestType.GetInterface("IPreHandlerRequest") != null)
-            {
-                requestPipeline.AddNewHandler(requestHandler, Common.HandlerType.PRE_HANDLE);
-            }
-            else
-            {
-                throw new ArgumentException("RequestHandler dont have a valid base type");
-            }
-        }
-
+       
     }
 }

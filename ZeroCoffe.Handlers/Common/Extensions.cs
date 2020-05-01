@@ -16,7 +16,7 @@ namespace ZeroCoffe.Handlers.Common
             if (mediator != null)
             {
 
-                mediator.Register<IServiceRequest>(Activator.CreateInstance<TImplementation>());
+                //ediator.Register<IServiceRequest>(Activator.CreateInstance<TImplementation>());
             }
 
         }

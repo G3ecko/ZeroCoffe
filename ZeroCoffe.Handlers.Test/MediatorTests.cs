@@ -16,20 +16,20 @@ namespace ZeroCoffe.Handlers.Test
     {
         Mediator mediator;
         Dictionary<string, object> ctxMock = new Dictionary<string, object>();
-
+/*
+      
         [Fact]
         public async void When_Meditor_Register_One_Handler()
         {
             mediator = new Mediator();
             Mock<IRequestHandler> mock = new Mock<IRequestHandler>();
             Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
-
+            Mock<IRequestMock1> mock1 = new Mock<IRequestMock1>();
            
             mediator.Register<IRequestMock1>(mock.Object);
             mediator.requestPipeline.Handlers.Count.ShouldBe(1);
         }
-
-        [Fact]
+  [Fact]
         public async void When_Meditor_Register_One_PreHandler()
         {
             mediator = new Mediator();
@@ -159,7 +159,7 @@ namespace ZeroCoffe.Handlers.Test
         }
 
 
-       
+       */
     }
 }
 
