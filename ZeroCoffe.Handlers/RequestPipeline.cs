@@ -25,7 +25,7 @@ namespace ZeroCoffe.Handlers
             var resList = new List<IResponse>();
             var handlers = this.provider.GetHandlers(request);
 
-            var preHandlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface("IPreHandlerRequest") != null);
+            var preHandlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface(nameof(IPreHandlerRequest)) != null);
 
             await ExecHandlers(request, preHandlers, resList, Context);
 
@@ -33,7 +33,7 @@ namespace ZeroCoffe.Handlers
                 return resList;
 
             resList.Clear();
-            var Handlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface("IHandlerRequest") != null);
+            var Handlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface(nameof(IRequestHandler)) != null);
 
             await ExecHandlers(request, Handlers, resList, Context);
             if (resList.Any(o => o.AnyError))

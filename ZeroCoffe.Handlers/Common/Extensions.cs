@@ -12,13 +12,11 @@ namespace ZeroCoffe.Handlers.Common
     {
         public static void RegisterService<IServiceRequest, TImplementation>(this IApplicationBuilder app) where TImplementation : IBaseHandler where IServiceRequest : IRequest
         {
-            var mediator = app.ApplicationServices.GetService<IMediator>();
-            if (mediator != null)
+            var handlersServiceProvider = app.ApplicationServices.GetService<IHandlersServiceProvider>();
+            if (handlersServiceProvider != null)
             {
-
-                //ediator.Register<IServiceRequest>(Activator.CreateInstance<TImplementation>());
+                handlersServiceProvider.Register<IServiceRequest>(Activator.CreateInstance<TImplementation>());
             }
-
         }
 
         public static TResponse GetResponse<TResponse>(this List<IResponse> responses) where TResponse : IResponse

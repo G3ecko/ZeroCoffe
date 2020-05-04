@@ -14,6 +14,15 @@ namespace ZeroCoffe.Handlers.Common
         }
     }
 
+    public class HandlersSample_1 : Handler<TestRequest1, TestResponse1>
+    {
+        public override Task<TestResponse1> Handle(TestRequest1 response, Dictionary<string, object> Context)
+        {
+
+            return Task.FromResult(new TestResponse1() { text = response.text });
+        }
+    }
+
     public class HandlersSample1Error : Handler<TestRequest1, TestResponse1>
     {
         public override Task<TestResponse1> Handle(TestRequest1 response, Dictionary<string, object> Context)
@@ -27,7 +36,7 @@ namespace ZeroCoffe.Handlers.Common
     {
         public override Task<TestResponse2> Handle(TestRequest2 response, Dictionary<string, object> Context)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new TestResponse2() { text = response.text });
         }
     }
 
@@ -36,6 +45,15 @@ namespace ZeroCoffe.Handlers.Common
         public override Task<TestResponse1> Handle(TestRequest1 response, Dictionary<string, object> Context)
         {
             return Task.FromResult(new TestResponse1() { AnyError = true });
+        }
+    }
+
+    public class HandlersSampleWithErrorExecption : PreHandler<TestRequest1, TestResponse1>
+    {
+        public override Task<TestResponse1> Handle(TestRequest1 response, Dictionary<string, object> Context)
+        {
+
+            throw new NotImplementedException();
         }
     }
 
