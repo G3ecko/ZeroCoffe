@@ -8,7 +8,6 @@ namespace ZeroCoffe.Handlers.Interface
 {
     public interface IMediator
     {
-        void Register<TRequest>(IBaseHandler requestHandler) where TRequest : IRequest;
         Task<List<IResponse>> HandleRequest(IRequest request = null);
     }
 }

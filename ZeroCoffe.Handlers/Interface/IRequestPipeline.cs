@@ -9,10 +9,7 @@ namespace ZeroCoffe.Handlers.Interface
 {
     public interface IRequestPipeline
     {
-        List<IBaseHandler> preHanlders { get; }
-        List<IBaseHandler> Handlers { get; }
-        void AddNewHandler(IBaseHandler handler, HandlerType handlerType);
         Task<List<IResponse>> ExecPipeline(IRequest request);
-        (List<IBaseHandler>, List<IBaseHandler>) FilterHandlersByType(Type type);
+        List<IBaseHandler> FilterHandlers(List<IBaseHandler> handlers, Func<IBaseHandler,bool> filter);
     }
 }

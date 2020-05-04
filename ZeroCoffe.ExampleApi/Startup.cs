@@ -30,9 +30,10 @@ namespace ZeroCoffe.ExampleApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IMediator, Mediator>();
 
-          
+            services.AddSingleton<IMediator, Mediator>();
+            services.AddSingleton<IRequestPipeline, RequestPipeline>();
+            services.AddSingleton<IHandlersServiceProvider, HandlersServiceProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,7 +45,6 @@ namespace ZeroCoffe.ExampleApi
             }
 
             app.RegisterService<WeatherHandlerRequest, WeatherHandler>();
-
             app.RegisterService<ExampleRequest, ValidationExample>();
             app.RegisterService<ExampleRequest, HandleExample>();
 
