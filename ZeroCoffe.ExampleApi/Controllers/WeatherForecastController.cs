@@ -53,7 +53,8 @@ namespace ZeroCoffe.ExampleApi.Controllers
             }
             else
             {
-                return Ok(res.GetResponse<ExampleResponse>());
+                var result = res.GetResponse<ExampleResponse>();
+                return Ok(result);
             }
 
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ZeroCoffe.Handlers;
 using ZeroCoffe.Handlers.Interface;
 
 namespace ZeroCoffe.ExampleApi.Handlers
@@ -14,7 +15,7 @@ namespace ZeroCoffe.ExampleApi.Handlers
         };
 
 
-        public override Task<WeatherHandlerResponse> Handle(WeatherHandlerRequest response, Dictionary<string, object> Context)
+        public override Task<WeatherHandlerResponse> Handle(WeatherHandlerRequest response, IDictionary<string, object> Context)
         {
 
            var rng = new Random();
@@ -34,7 +35,7 @@ namespace ZeroCoffe.ExampleApi.Handlers
     public class WeatherHandlerValidation : PreHandler<WeatherHandlerRequest, WeatherHandlerResponse>
     {
    
-        public override Task<WeatherHandlerResponse> Handle(WeatherHandlerRequest response, Dictionary<string, object> Context)
+        public override Task<WeatherHandlerResponse> Handle(WeatherHandlerRequest response, IDictionary<string, object> Context)
         {
             WeatherHandlerResponse weatherHandlerResponse = new WeatherHandlerResponse();
             weatherHandlerResponse.AnyError = (string.IsNullOrEmpty(response.text));
@@ -42,7 +43,7 @@ namespace ZeroCoffe.ExampleApi.Handlers
         }
     }
 
-    public class WeatherHandlerResponse : IResponse
+    public class WeatherHandlerResponse : BaseResponse
     {
         public WeatherHandlerResponse()
         {
@@ -55,8 +56,9 @@ namespace ZeroCoffe.ExampleApi.Handlers
             this.weatherForecasts = weatherForecasts;
         }
 
-        public bool AnyError { get; set; }
+      
         public IEnumerable<WeatherForecast> weatherForecasts { get; set; }
+    
     }
 
     public class WeatherHandlerRequest : IRequest

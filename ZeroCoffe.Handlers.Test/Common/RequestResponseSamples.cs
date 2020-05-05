@@ -13,15 +13,15 @@ namespace ZeroCoffe.Handlers.Common
     {
         public string text { get; set; }
     }
-    public class TestResponse1 : IResponse
+    public class TestResponse1 : BaseResponse
     {
         public string text { get; set; }
-        public bool AnyError { get; set; } 
+      
     }
 
-    public class TestResponse2 : IResponse
+    public class TestResponse2 : BaseResponse
     {
         public string text { get; set; }
-        public bool AnyError { get; set; }
+      
     }
 }

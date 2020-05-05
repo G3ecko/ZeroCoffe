@@ -5,16 +5,15 @@ using ZeroCoffe.Handlers.Interface;
 
 namespace ZeroCoffe.Handlers.Common
 {
-    public  class DefaultResponseError : IResponse
+    public  class DefaultResponseError : BaseResponse
     {
-        public DefaultResponseError(bool anyError, string errorMessage)
+        public DefaultResponseError(string errorMessage)
         {
-            AnyError = anyError;
+            AnyError = true;
             ErrorMessage = errorMessage;
         }
 
-        public bool AnyError { get; set ; }
-
         public string ErrorMessage { get; set; }
+
     }
 }

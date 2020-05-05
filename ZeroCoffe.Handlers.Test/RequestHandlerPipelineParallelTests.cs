@@ -12,17 +12,17 @@ namespace ZeroCoffe.Handlers.Test
     using ZeroCoffe.Handlers.Interface;
     using ZeroCoffe.Handlers.Test.Common;
 
-    public class RequestHandlerPipelineTests
+    public class RequestHandlerPipelineParallelTests
     {
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_One_Handler()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_One_Handler()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
             TestRequest1 testRequest1 = new TestRequest1();
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1() });
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);
@@ -35,7 +35,7 @@ namespace ZeroCoffe.Handlers.Test
         }
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_Handler()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_Handler()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -45,7 +45,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest2.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1() });
             providerMock.Setup(o => o.GetHandlers(testRequest2)).Returns(new List<IBaseHandler> { new HandlersSample2() });
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);
@@ -65,7 +65,7 @@ namespace ZeroCoffe.Handlers.Test
 
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_Handler_SameKey()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_Handler_SameKey()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -73,7 +73,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1(), new HandlersSampleNOError() });
 
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);
@@ -87,7 +87,7 @@ namespace ZeroCoffe.Handlers.Test
         }
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_Handler_SameKey_Response()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_Handler_SameKey_Response()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -95,7 +95,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1(), new HandlersSample_1() });
 
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
             var res = await provider.ExecPipeline(testRequest1);
 
@@ -112,7 +112,7 @@ namespace ZeroCoffe.Handlers.Test
 
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_Handler_Error()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_Handler_Error()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -120,7 +120,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1(), new HandlersSample1Error() });
 
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);
@@ -132,7 +132,7 @@ namespace ZeroCoffe.Handlers.Test
         }
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_PreHandler_Error()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_PreHandler_Error()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -140,7 +140,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1(), new HandlersSampleWithError() });
 
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);
@@ -154,7 +154,7 @@ namespace ZeroCoffe.Handlers.Test
 
 
         [Fact]
-        public async void When_RequestPipeline_ExecPipeLine_With_MoreThanOne_Execpetion()
+        public async void When_RequestPipelineParallel_ExecPipeLine_Parallel_With_MoreThanOne_Execpetion()
         {
 
             Mock<IHandlersServiceProvider> providerMock = new Mock<IHandlersServiceProvider>();
@@ -162,7 +162,7 @@ namespace ZeroCoffe.Handlers.Test
             testRequest1.text = "1";
             providerMock.Setup(o => o.GetHandlers(testRequest1)).Returns(new List<IBaseHandler> { new HandlersSample1(), new HandlersSampleWithErrorExecption() });
 
-            RequestPipeline provider = new RequestPipeline(providerMock.Object);
+            RequestPipelineParallel provider = new RequestPipelineParallel(providerMock.Object);
 
 
             var res = await provider.ExecPipeline(testRequest1);

@@ -7,13 +7,14 @@ using ZeroCoffe.Handlers.Interface;
 public abstract class PreHandler<TRequest, TResponse> : IPreHandlerRequest
     where TRequest : IRequest
 {
-    public Task<IResponse> RequestHandle(IRequest request, Dictionary<string, object> Context)
+    public Task<IResponse> RequestHandle(IRequest request, IDictionary<string, object> Context)
     {
-
-        return Task.FromResult((IResponse)Handle((TRequest)request, Context).GetAwaiter().GetResult());
+        var res = (IResponse)Handle((TRequest)request, Context).GetAwaiter().GetResult();
+        res.HandledBy = typeof(IPreHandlerRequest).Name;
+        return Task.FromResult(res);
     }
 
-    public virtual Task<TResponse> Handle(TRequest response, Dictionary<string, object> Context)
+    public virtual Task<TResponse> Handle(TRequest response, IDictionary<string, object> Context)
     {
         return Task.FromResult((TResponse)default);
     }

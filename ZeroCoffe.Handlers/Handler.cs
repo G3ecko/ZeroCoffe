@@ -8,14 +8,15 @@ using ZeroCoffe.Handlers.Interface;
 public abstract class Handler<TRequest, TResponse> : IRequestHandler
     where TRequest : IRequest
 {
-    public Task<IResponse> RequestHandle(IRequest request, Dictionary<string, object> Context)
+    public Task<IResponse> RequestHandle(IRequest request, IDictionary<string, object> Context)
     {
-
-       return  Task.FromResult((IResponse)Handle((TRequest)request, Context).GetAwaiter().GetResult());
+        var res = (IResponse)Handle((TRequest)request, Context).GetAwaiter().GetResult();
+        res.HandledBy = typeof(IRequestHandler).Name;
+        return Task.FromResult(res);
     }
 
-    public abstract Task<TResponse> Handle(TRequest response, Dictionary<string, object> Context);
+    public abstract Task<TResponse> Handle(TRequest response, IDictionary<string, object> Context);
 
     public Type GetRequestType() => typeof(TRequest);
-    
+
 }

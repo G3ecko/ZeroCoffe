@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,57 +15,53 @@ namespace ZeroCoffe.Handlers
     {
         private readonly IHandlersServiceProvider provider;
 
-        public RequestPipeline(IHandlersServiceProvider  provider = null)
+        public RequestPipeline(IHandlersServiceProvider provider = null)
         {
             this.provider = provider ?? new HandlersServiceProvider();
         }
 
-        public async Task<List<IResponse>> ExecPipeline(IRequest request)
+        public async Task<IList<IResponse>> ExecPipeline(IRequest request)
         {
             Dictionary<string, object> Context = new Dictionary<string, object>();
-            var resList = new List<IResponse>();
+
             var handlers = this.provider.GetHandlers(request);
+            var HandlersResult = this.ExecHandlerSequencial(request, handlers, Context);
 
-            var preHandlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface(nameof(IPreHandlerRequest)) != null);
-
-            await ExecHandlers(request, preHandlers, resList, Context);
-
-            if (resList.Any(o => o.AnyError))
-                return resList;
-
-            resList.Clear();
-            var Handlers = FilterHandlers(handlers,(o) => o.GetType().GetInterface(nameof(IRequestHandler)) != null);
-
-            await ExecHandlers(request, Handlers, resList, Context);
-            if (resList.Any(o => o.AnyError))
-                return resList;
-
-            return resList;
+            return await Task.FromResult(HandlersResult);
         }
 
-        public List<IBaseHandler> FilterHandlers(List<IBaseHandler> handlers, Func<IBaseHandler,bool> filter) 
+        public IList<IBaseHandler> FilterHandlers(List<IBaseHandler> handlers, Func<IBaseHandler, bool> filter)
                         => (handlers.Where(filter).ToList());
 
-        private async Task ExecHandlers(IRequest request, List<IBaseHandler> Handlers, List<IResponse> resList, Dictionary<string, object> Context)
+
+        private List<IResponse> ExecHandlerSequencial(IRequest request, List<IBaseHandler> Handlers, Dictionary<string, object> Context)
         {
+            List<IResponse> responses = new List<IResponse>();
             if (Handlers != null && Handlers.Count > 0)
             {
-                foreach (var handler in Handlers)
-                {
-                    try
-                    {
-                        var res = await handler.RequestHandle(request, Context);
-                        resList.Add(res);
-                        if (res.AnyError)
-                            break;
+                var preHandlers = FilterHandlers(Handlers, (o) => o.GetType().GetInterface(nameof(IPreHandlerRequest)) != null).ToList();
+                var handlers = FilterHandlers(Handlers, (o) => o.GetType().GetInterface(nameof(IRequestHandler)) != null).ToList();
 
-                    }
-                    catch
-                    {
-                        resList.Add(new DefaultResponseError(true, $"Erro processing handler {handler.GetType()}"));
-                        break;
-                    }
-                }
+                preHandlers.ForEach(prehandler => ProcessHandler(request, Context, prehandler, responses));
+
+                if (!responses.Any() || responses.Any(o => !o.AnyError))
+                    handlers.ForEach(handler => ProcessHandler(request, Context, handler, responses));
+            }
+
+            return responses.ToList();
+        }
+
+        
+
+        private static void ProcessHandler(IRequest request, Dictionary<string, object> Context, IBaseHandler handler, List<IResponse> responses)
+        {
+            try
+            {
+                responses.Add(handler.RequestHandle(request, Context).GetAwaiter().GetResult());
+            }
+            catch (Exception ex)
+            {
+                responses.Add(new DefaultResponseError(ex.Message));
             }
         }
     }
