@@ -33,11 +33,12 @@ List<TResponse> GetResponses<TResponse>(this IList<IResponse> responses)
 List<TResponse> GetPreResponses<TResponse>(this IList<IResponse> responses)
 
 ```
+#### How to use version 1.2.0
 
 #####  Add meditor service
 ```
 
-#### How to use version 1.2.0
+
 
 public void ConfigureServices(IServiceCollection services)
 {
