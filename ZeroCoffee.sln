@@ -13,10 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroCoffe.Handlers.Test", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{F5120E2D-96B1-4421-967C-350A0DAC0105}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroCoffe.ExampleApi", "ZeroCoffe.ExampleApi\ZeroCoffe.ExampleApi.csproj", "{8AFAAF4B-A042-4D1B-A4FA-6861B66ED726}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroCoffe.ExampleApi", "ZeroCoffe.ExampleApi\ZeroCoffe.ExampleApi.csproj", "{8AFAAF4B-A042-4D1B-A4FA-6861B66ED726}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9609B4B-9BE0-4DB2-83AA-B09EDA8A3BE5}"
 	ProjectSection(SolutionItems) = preProject
+		Changlog.md = Changlog.md
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject

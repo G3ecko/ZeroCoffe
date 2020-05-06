@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ZeroCoffe.Handlers;
 using ZeroCoffe.Handlers.Interface;
 
 namespace ZeroCoffe.ExampleApi.Handlers
 {
-    public class ExampleResponse : IResponse
+    public class ExampleResponse : BaseResponse
     {
         public ExampleResponse()
         {
@@ -15,11 +16,9 @@ namespace ZeroCoffe.ExampleApi.Handlers
 
         public ExampleResponse(bool anyError)
         {
-            AnyError = anyError;
+            base.AnyError = anyError;
 
         }
-
-        public bool AnyError { get; set; }
         public string textOutput { get; set; }
     }
 
@@ -31,7 +30,7 @@ namespace ZeroCoffe.ExampleApi.Handlers
     public class ValidationExample : PreHandler<ExampleRequest, ExampleResponse>
     {
 
-        public override Task<ExampleResponse> Handle(ExampleRequest response, Dictionary<string, object> Context)
+        public override Task<ExampleResponse> Handle(ExampleRequest response, IDictionary<string, object> Context)
         {
             ExampleResponse exampleResponse = new ExampleResponse();
             exampleResponse.AnyError = (response == null || string.IsNullOrEmpty(response.text));
@@ -42,7 +41,7 @@ namespace ZeroCoffe.ExampleApi.Handlers
     public class HandleExample : Handler<ExampleRequest, ExampleResponse>
     {
 
-        public override Task<ExampleResponse> Handle(ExampleRequest response, Dictionary<string, object> Context)
+        public override Task<ExampleResponse> Handle(ExampleRequest response, IDictionary<string, object> Context)
         {
             ExampleResponse exampleResponse = new ExampleResponse();
             exampleResponse.textOutput = response.text;

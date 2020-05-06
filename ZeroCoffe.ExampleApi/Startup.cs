@@ -31,9 +31,7 @@ namespace ZeroCoffe.ExampleApi
         {
             services.AddControllers();
 
-            services.AddSingleton<IMediator, Mediator>();
-            services.AddSingleton<IRequestPipeline, RequestPipeline>();
-            services.AddSingleton<IHandlersServiceProvider, HandlersServiceProvider>();
+            services.UseZeroCoffeMediatorParallel();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

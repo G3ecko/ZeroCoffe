@@ -11,7 +11,7 @@ namespace ZeroCoffe.Handlers.Interface
 {
     public interface IBaseHandler
     {
-        Task<IResponse> RequestHandle(IRequest request, Dictionary<string, object> Context);
+        Task<IResponse> RequestHandle(IRequest request, IDictionary<string, object> Context);
         Type GetRequestType();
     }
 

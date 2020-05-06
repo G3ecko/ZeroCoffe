@@ -20,7 +20,7 @@ namespace ZeroCoffe.Handlers
             this.requestPipeline = requestPipeline ?? new RequestPipeline();
         }
 
-        public async Task<List<IResponse>> HandleRequest(IRequest request)
+        public async Task<IList<IResponse>> HandleRequest(IRequest request)
         {
             return await requestPipeline.ExecPipeline(request);
         }
